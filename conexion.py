@@ -17,20 +17,14 @@ class Conexion:
             database=self.database,
             autocommit=True
         )
-
     def consultar(self, sql, datos=None):
         try:
-            cnx = self._conectar()
-            cursor = cnx.cursor(dictionary=True)
+            cursor = self.conexion.cursor(dictionary=True)
             cursor.execute(sql, datos or ())
-            resultado = cursor.fetchall()
-            cursor.close()
-            cnx.close()
-            return resultado
+            return cursor.fetchall()
         except Error as e:
-            print(f"Error al consultar: {e}")
+            print(f"Error al consultar la base de datos: {e}")
             return []
-
     def ejecutar(self, sql, datos):
         try:
             cnx = self._conectar()

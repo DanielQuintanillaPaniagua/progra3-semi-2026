@@ -1,13 +1,13 @@
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+﻿from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib import parse
 from urllib.parse import urlparse, parse_qs
 import crud_clientes
-import crud_periodos
+import crud_productos
 import json
 
 port = 3000
-crudClientes = crud_clientes.crud_clientes()
-crudPeriodos = crud_periodos.crud_periodos()
+crudClientes  = crud_clientes.crud_clientes()
+crudProductos = crud_productos.crud_productos()
 
 
 class miServidor(SimpleHTTPRequestHandler):
@@ -24,30 +24,27 @@ class miServidor(SimpleHTTPRequestHandler):
         datos = parse.unquote(datos)
         datos = json.loads(datos)
 
-        if self.path == "/cliente":
+        if datos.get("modulo") == "cliente":
             respuesta = {'msg': crudClientes.administrar(datos)}
-        elif self.path == "/periodo":
-            respuesta = {'msg': crudPeriodos.administrar(datos)}
-        elif self.path == "/periodo/calcular":
-            respuesta = crudPeriodos.previsualizar(
-                datos["idCliente"], datos["idProducto"],
-                datos["balance"], datos["desde"])
+        elif datos.get("modulo") == "producto":
+            respuesta = {'msg': crudProductos.administrar(datos)}
         else:
-            respuesta = {'msg': 'Ruta no encontrada'}
+            respuesta = {'msg': 'Modulo no reconocido'}
 
         self._json(respuesta)
 
     def do_GET(self):
         urlParse = urlparse(self.path)
         qs = parse_qs(urlParse.query)
-        buscar = qs.get("buscar", [""])[0]
+        buscar = qs.get('buscar', [''])[0]
 
+        # --- APIs ---
         if urlParse.path == "/clientes":
             self._json(crudClientes.consultar(buscar))
-        elif urlParse.path == "/periodos":
-            self._json(crudPeriodos.consultar(buscar))
-        elif urlParse.path == "/":
-            self.path = "/index.html"
+        elif urlParse.path == "/productos":
+            self._json(crudProductos.consultar(buscar))
+        # --- Archivos estáticos (html, css, js, etc) ---
+        elif urlParse.path == "/" or urlParse.path.endswith(".html") or "." in urlParse.path.split("/")[-1]:
             return SimpleHTTPRequestHandler.do_GET(self)
         else:
             self.send_error(404, "Ruta no encontrada")
