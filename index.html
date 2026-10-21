@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <style>
+        /* Estilos para la pantalla de login que cubre todo */
+        #pantallaLogin {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f0f2f5; /* Fondo gris claro o el color que prefieras */
+            z-index: 9999; /* Asegura que esté por encima de todo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pantalla de Login (Oculta por defecto) -->
+<div id="pantallaLogin" style="display: none;"></div>
+
+<!-- Sistema Principal (Oculto por defecto) -->
+<div id="sistemaPrincipal" class="container-fluid p-3" style="display: none;">
+    <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-primary" onclick="cargarForm('clientes')">Clientes</button>
+        <button class="btn btn-primary" onclick="cargarForm('productos')">Productos</button>
+        <button class="btn btn-primary" onclick="cargarForm('usuarios')">Usuarios</button>
+        <button class="btn btn-danger ms-auto" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+    <div id="contenedorFormularios" class="d-flex flex-wrap gap-3"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+async function cargarForm(nombre, contenedorId = "contenedorFormularios") {
+    let archivo = "";
+    switch (nombre) {
+        case 'clientes': archivo = 'frmCliente.html'; break;
+        case 'busqueda_clientes': archivo = 'frmConsultarCliente.html'; break;
+        case 'productos': archivo = 'frmProducto.html'; break;
+        case 'busqueda_productos': archivo = 'frmConsultarProducto.html'; break;
+        case 'usuarios': archivo = 'frmUsuario.html'; break;
+        case 'busqueda_usuarios': archivo = 'frmConsultarUsuario.html'; break;
+        case 'login': archivo = 'frmLogin.html'; break;
+        default: alert("Modulo no reconocido"); return;
+    }
+    if (document.getElementById("form_" + nombre)) return;
+
+    try {
+        let response = await fetch(archivo);
+        let html = await response.text();
+        let div = document.createElement("div");
+        div.id = "form_" + nombre;
+        div.innerHTML = html;
+        
+        div.querySelectorAll("script").forEach(sv => {
+            let sn = document.createElement("script");
+            sn.textContent = sv.textContent;
+            sv.replaceWith(sn);
+        });
+        
+        document.getElementById(contenedorId).appendChild(div);
+        
+        div.querySelectorAll("[data-form]").forEach(btn => {
+            btn.addEventListener("click", () => div.remove());
+        });
+    } catch (e) { alert("Error: " + e.message); }
+}
+
+function cerrarSesion() {
+    sessionStorage.removeItem("usuario_logueado");
+    window.location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (sessionStorage.getItem("usuario_logueado")) {
+        // Si hay sesión, mostramos el sistema y cargamos clientes
+        document.getElementById("sistemaPrincipal").style.display = "block";
+        cargarForm('clientes');
+    } else {
+        // Si NO hay sesión, mostramos SOLO la pantalla de login
+        document.getElementById("pantallaLogin").style.display = "flex";
+        cargarForm('login', 'pantallaLogin');
+    }
+});
+</script>
+</body>
+</html>

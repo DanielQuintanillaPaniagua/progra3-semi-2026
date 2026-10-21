@@ -1,0 +1,52 @@
+<form id="frmConsultarUsuario">
+    <div class="card text-bg-dark mb-3" style="min-width: 700px;">
+        <div class="card-header">
+            <div class="d-flex">Busqueda de Usuarios
+                <div class="ms-auto"><button data-form="busqueda_usuarios" type="button"
+                        class="btn-close btn-close-white"></button></div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="5"><input type="search" placeholder="buscar" id="txtBuscarUsuario"
+                                    class="form-control"></th>
+                        </tr>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblUsuarios"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    txtBuscarUsuario.addEventListener('keyup', e => { e.preventDefault(); obtenerUsuarios(txtBuscarUsuario.value); });
+    obtenerUsuarios();
+
+    async function obtenerUsuarios(buscar = "") {
+        let r = await fetch(`/usuarios?buscar=${buscar}`), datos = await r.json();
+        let filas = "";
+        datos.forEach(e => {
+            filas += `<tr onClick='modificarUsuario(${JSON.stringify(e)}, event)'>
+            <td>${e.usuario}</td><td>${e.nombre}</td><td>${e.direccion || ''}</td><td>${e.telefono || ''}</td>
+            <td><input onClick='eliminarUsuario(${JSON.stringify(e)}, event)' type="button" value="DEL" class="btn btn-danger"/></td>
+        </tr>`;
+        });
+        tblUsuarios.innerHTML = filas;
+    }
+    function eliminarUsuario(data, event) {
+        event.preventDefault(); event.stopPropagation();
+        if (confirm(`¿Seguro de eliminar al usuario: ${data.nombre}?`)) {
+            idUsuario = data.idUsuario; accionUsuario = "eliminar"; guardarUsuario();
+        }
+    }
+</script>

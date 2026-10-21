@@ -1,0 +1,35 @@
+<form id="frmLogin">
+    <div class="card text-bg-dark mb-3 mx-auto mt-5" style="max-width: 400px;">
+        <div class="card-header text-center">
+            <h4>Iniciar Sesión</h4>
+        </div>
+        <div class="card-body">
+            <div class="row p-1">
+                <div class="col-12"><input required placeholder="Usuario" id="txtUsuarioLogin" class="form-control"
+                        type="text"></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12"><input required placeholder="Clave" id="txtClaveLogin" class="form-control"
+                        type="password"></div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <input type="submit" value="Ingresar" class="btn btn-primary w-100">
+        </div>
+    </div>
+</form>
+<script>
+    frmLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let datos = { modulo: "login", usuario: txtUsuarioLogin.value, clave: txtClaveLogin.value };
+        let r = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+        let j = await r.json();
+
+        if (j.msg === "ok") {
+            sessionStorage.setItem("usuario_logueado", txtUsuarioLogin.value);
+            window.location.reload();
+        } else {
+            alert("Acceso Denegado: " + j.msg);
+        }
+    });
+</script>

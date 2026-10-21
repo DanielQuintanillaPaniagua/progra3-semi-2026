@@ -1,0 +1,69 @@
+<form id="frmUsuario">
+    <div class="card text-bg-dark mb-3" style="min-width: 600px;">
+        <div class="card-header">
+            <div class="d-flex">Admin de Usuarios
+                <div class="ms-auto"><button data-form="usuarios" type="button"
+                        class="btn-close btn-close-white"></button></div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row p-1">
+                <div class="col-12"><input required placeholder="Usuario" id="txtUsuario" class="form-control"
+                        type="text"></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12"><input required placeholder="Clave" id="txtClave" class="form-control"
+                        type="password"></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12"><input required placeholder="Nombre Completo" id="txtNombre" class="form-control"
+                        type="text"></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12"><input placeholder="Direccion" id="txtDireccion" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12"><input placeholder="Telefono" id="txtTelefono" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <input type="submit" value="Guardar" class="btn btn-primary" id="btnGuardarUsuario">
+            <input type="button" value="Buscar" class="btn btn-secondary" id="btnBuscarUsuario">
+            <input type="reset" value="Limpiar" class="btn btn-warning" id="btnLimpiarUsuario">
+        </div>
+    </div>
+</form>
+<script>
+    var accionUsuario = 'nuevo', idUsuario = '';
+    frmUsuario.addEventListener('submit', e => { e.preventDefault(); guardarUsuario(); });
+    frmUsuario.addEventListener('reset', e => { e.preventDefault(); limpiarFormularioUsuario(); });
+
+    function modificarUsuario(data, event) {
+        event.preventDefault();
+        idUsuario = data.idUsuario; accionUsuario = "modificar";
+        txtUsuario.value = data.usuario; txtClave.value = data.clave; txtNombre.value = data.nombre;
+        txtDireccion.value = data.direccion || ''; txtTelefono.value = data.telefono || '';
+    }
+
+    async function guardarUsuario() {
+        let datos = {
+            modulo: "usuario", usuario: txtUsuario.value, clave: txtClave.value,
+            nombre: txtNombre.value, direccion: txtDireccion.value, telefono: txtTelefono.value,
+            accion: accionUsuario, idUsuario: idUsuario
+        };
+        let r = await fetch('/usuario', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+        let j = await r.json();
+        if (j.msg != "ok") { alert("Error: " + j.msg); return; }
+
+        if (typeof obtenerUsuarios === "function") obtenerUsuarios();
+        limpiarFormularioUsuario();
+    }
+
+    function limpiarFormularioUsuario() {
+        accionUsuario = 'nuevo'; idUsuario = '';
+        txtUsuario.value = ''; txtClave.value = ''; txtNombre.value = ''; txtDireccion.value = ''; txtTelefono.value = '';
+    }
+    btnBuscarUsuario.addEventListener('click', e => { e.preventDefault(); cargarForm('busqueda_usuarios'); });
+</script>

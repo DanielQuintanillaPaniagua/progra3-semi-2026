@@ -1,0 +1,16 @@
+﻿<form id="frmConsultarProducto">
+    <div class="card text-bg-dark mb-3" style="min-width: 600px;">
+        <div class="card-header"><div class="d-flex">Busqueda Productos<div class="ms-auto"><button data-form="busqueda_productos" type="button" class="btn-close btn-close-white"></button></div></div></div>
+        <div class="card-body"><table class="table table-striped text-white"><thead><tr><th colspan="2"><input type="search" id="txtBuscarProducto" class="form-control"></th></tr><tr><th>Codigo</th><th>Descripcion</th></tr></thead><tbody id="tblProductos"></tbody></table></div>
+    </div>
+</form>
+<script>
+txtBuscarProducto.addEventListener('keyup', e => { obtenerProductos(txtBuscarProducto.value); });
+obtenerProductos();
+async function obtenerProductos(buscar = "") {
+    let r = await fetch(`/productos?buscar=${buscar}`), datos = await r.json();
+    let filas = "";
+    datos.forEach(e => { filas += `<tr><td>${e.codigo}</td><td>${e.descripcion}</td></tr>`; });
+    tblProductos.innerHTML = filas;
+}
+</script>

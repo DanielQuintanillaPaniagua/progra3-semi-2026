@@ -1,0 +1,27 @@
+﻿<form id="frmCliente">
+    <div class="card text-bg-dark mb-3" style="min-width: 600px;">
+        <div class="card-header"><div class="d-flex">Admin de Clientes<div class="ms-auto"><button data-form="clientes" type="button" class="btn-close btn-close-white"></button></div></div></div>
+        <div class="card-body">
+            <div class="row p-1"><div class="col-12"><input required placeholder="Codigo" id="txtCodigoCliente" class="form-control" type="text"></div></div>
+            <div class="row p-1"><div class="col-12"><input required placeholder="Nombre" id="txtNombreCliente" class="form-control" type="text"></div></div>
+        </div>
+        <div class="card-footer text-center">
+            <input type="submit" value="Guardar" class="btn btn-primary" id="btnGuardarCliente">
+            <input type="button" value="Buscar" class="btn btn-secondary" id="btnBuscarCliente">
+            <input type="reset" value="Limpiar" class="btn btn-warning">
+        </div>
+    </div>
+</form>
+<script>
+var accionCliente = 'nuevo', idCliente = '';
+frmCliente.addEventListener('submit', e => { e.preventDefault(); guardarClientes(); });
+function modificarCliente(data, event) { event.preventDefault(); idCliente = data.idCliente; accionCliente = "modificar"; txtCodigoCliente.value = data.codigo; txtNombreCliente.value = data.nombre; }
+async function guardarClientes() {
+    let datos = { modulo: "cliente", codigo: txtCodigoCliente.value, nombre: txtNombreCliente.value, accion: accionCliente, idCliente: idCliente };
+    let r = await fetch('/cliente', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos) });
+    let j = await r.json();
+    if (j.msg != "ok") { alert("Error: " + j.msg); return; }
+    if (typeof obtenerClientes === "function") obtenerClientes();
+}
+btnBuscarCliente.addEventListener('click', e => { e.preventDefault(); cargarForm('busqueda_clientes'); });
+</script>

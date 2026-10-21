@@ -1,0 +1,16 @@
+﻿<form id="frmConsultarCliente">
+    <div class="card text-bg-dark mb-3" style="min-width: 600px;">
+        <div class="card-header"><div class="d-flex">Busqueda Clientes<div class="ms-auto"><button data-form="busqueda_clientes" type="button" class="btn-close btn-close-white"></button></div></div></div>
+        <div class="card-body"><table class="table table-striped text-white"><thead><tr><th colspan="2"><input type="search" id="txtBuscarCliente" class="form-control"></th></tr><tr><th>Codigo</th><th>Nombre</th></tr></thead><tbody id="tblClientes"></tbody></table></div>
+    </div>
+</form>
+<script>
+txtBuscarCliente.addEventListener('keyup', e => { obtenerClientes(txtBuscarCliente.value); });
+obtenerClientes();
+async function obtenerClientes(buscar = "") {
+    let r = await fetch(`/clientes?buscar=${buscar}`), datos = await r.json();
+    let filas = "";
+    datos.forEach(e => { filas += `<tr><td>${e.codigo}</td><td>${e.nombre}</td></tr>`; });
+    tblClientes.innerHTML = filas;
+}
+</script>
