@@ -1,7 +1,27 @@
 import conexion
+
 db = conexion.Conexion()
 
 class crud_usuarios_usss022525:
+
+    def __init__(self):
+        # Esto se ejecuta automáticamente al instanciar la clase
+        self.crear_tabla()
+
+    def crear_tabla(self):
+        sql = """
+            CREATE TABLE IF NOT EXISTS usuarios_usss022525 (
+                idUsuario INT(10) AUTO_INCREMENT PRIMARY KEY,
+                usuario CHAR(35) NOT NULL UNIQUE,
+                clave CHAR(35) NOT NULL,
+                nombre CHAR(85) NOT NULL,
+                direccion CHAR(100),
+                telefono CHAR(9)
+            )
+        """
+        # Ejecutamos la creación (no pasamos datos porque no hay %s)
+        db.ejecutar(sql, ())
+
     def consultar(self, buscar=""):
         sql = "SELECT * FROM usuarios_usss022525 WHERE usuario LIKE %s OR nombre LIKE %s ORDER BY nombre"
         like = f"%{buscar}%"

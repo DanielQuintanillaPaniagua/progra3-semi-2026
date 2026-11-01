@@ -1,7 +1,12 @@
 ﻿<form id="frmConsultarCliente">
     <div class="card text-bg-dark mb-3" style="min-width: 600px;">
         <div class="card-header"><div class="d-flex">Busqueda Clientes<div class="ms-auto"><button data-form="busqueda_clientes" type="button" class="btn-close btn-close-white"></button></div></div></div>
-        <div class="card-body"><table class="table table-striped text-white"><thead><tr><th colspan="2"><input type="search" id="txtBuscarCliente" class="form-control"></th></tr><tr><th>Codigo</th><th>Nombre</th></tr></thead><tbody id="tblClientes"></tbody></table></div>
+        <div class="card-body">
+            <table class="table table-striped text-white">
+                <thead><tr><th colspan="3"><input type="search" id="txtBuscarCliente" class="form-control"></th></tr><tr><th>Codigo</th><th>Nombre</th><th></th></tr></thead>
+                <tbody id="tblClientes"></tbody>
+            </table>
+        </div>
     </div>
 </form>
 <script>
@@ -10,7 +15,25 @@ obtenerClientes();
 async function obtenerClientes(buscar = "") {
     let r = await fetch(`/clientes?buscar=${buscar}`), datos = await r.json();
     let filas = "";
-    datos.forEach(e => { filas += `<tr><td>${e.codigo}</td><td>${e.nombre}</td></tr>`; });
+    datos.forEach(e => { 
+        let base64 = btoa(unescape(encodeURIComponent(JSON.stringify(e))));
+        filas += `<tr>
+            <td>${e.codigo}</td><td>${e.nombre}</td>
+            <td><button class="btn btn-danger btn-sm btn-del-cli" data-user="${base64}">DEL</button></td>
+        </tr>`; 
+    });
     tblClientes.innerHTML = filas;
 }
+document.getElementById('tblClientes').addEventListener('click', function(e) {
+    let fila = e.target.closest('tr');
+    if (!fila) return;
+    let boton = fila.querySelector('.btn-del-cli');
+    let data = JSON.parse(decodeURIComponent(escape(atob(boton.getAttribute('data-user')))));
+    
+    if (e.target.classList.contains('btn-del-cli')) {
+        if (confirm(`¿Eliminar cliente ${data.nombre}?`)) { idCliente = data.idCliente; accionCliente = "eliminar"; guardarClientes(); }
+    } else {
+        modificarCliente(data, e);
+    }
+});
 </script>
