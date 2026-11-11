@@ -49,6 +49,9 @@
                 let form = e.target.dataset.form;
                 cargarForm(form);
             });
+            $(document).on('mousedown', '.position-absolute', function () {
+                traerAlFrente(this);
+            });
         });
         function cargarForm(form, callback) {
             if ($(`#${form} > form`).length <= 0) {
@@ -70,6 +73,13 @@
                 let form = e.target.dataset.form;
                 $(`#${form}`).hide();
             });
+        }
+        function traerAlFrente(elemento) {
+            let zIndices = $('.position-absolute').map(function () {
+                return parseInt($(this).css('z-index')) || 1;
+            }).get();
+            let maxZ = Math.max(...zIndices) + 1;
+            $(elemento).css('z-index', maxZ);
         }
     </script>
 </body>
